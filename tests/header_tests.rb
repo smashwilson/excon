@@ -1,28 +1,33 @@
 Shindo.tests('Excon response header support') do
   env_init
 
-  tests('Excon::Headers storage') do
+  tests('Excon::Headers storage').suceeds do
     headers = Excon::Headers.new
+    headers['Exact-Case'] = 'expected'
 
     tests('stores and retrieves as received').returns('expected') do
-      headers['Exact-Case'] = 'expected'
       headers['Exact-Case']
     end
 
     tests('enumerates keys as received').returns(['Exact-Case', 'Another-Header']) do
-      headers['Exact-Case'] = 'as-is'
       headers['Another-Header'] = 'as-is'
 
       headers.keys
     end
 
     tests('supports case-insensitive access').returns('expected') do
-      headers['Exact-Case'] = 'expected'
       headers['EXACT-CASE']
     end
 
     tests('but still returns nil for missing keys').returns(nil) do
       headers['Missing-Header']
+    end
+
+    tests('Hash methods for reading').succeeds do
+      headers['Exact-Case'] = 'expected'
+      tests('#assoc').returns(['Exact-Case', 'expected']) do
+        headers.assoc('exact-case')
+      end
     end
   end
 
