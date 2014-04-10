@@ -4,30 +4,21 @@ module Excon
     alias_method :raw_writer, :[]=
     alias_method :raw_reader, :[]
 
+    def initialize(*args)
+      super
+      @downcased = {}
+    end
+
     def [](key)
-      value = raw_reader(key)
-      if value.nil?
-        index_case_insensitive if @downcased.nil?
-        value = @downcased[key.downcase]
-      end
-      value
+      @downcased[key.downcase]
     end
 
     def []=(key, value)
       raw_writer(key, value)
-      @downcased[key.downcase] = value unless @downcased.nil?
+      @downcased[key.downcase] = value
     end
 
     alias_method :store, :[]=
-
-    private
-
-    def index_case_insensitive
-      @downcased = {}
-      each_pair do |key, value|
-        @downcased[key.downcase] = value
-      end
-    end
 
   end
 end
